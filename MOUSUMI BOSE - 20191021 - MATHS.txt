@@ -1,0 +1,323 @@
+Name - Mousumi Bose
+Course - Bsc (Hons) Mathematics (1st Year)
+Roll No. - 20191021
+
+Ques(1) :-
+
+mysql> Create database DU_Library;
+mysql> use DU_Library;
+
+mysql> Create table LibraryBooks (Accession_number integer Primary key, Title varchar(50), Author varchar(30),
+        -> Department varchar(30), PurchaseDate date, Price decimal(8,2)) ;
+
+mysql> Create table IssuedBooks (Accession_number integer, Borrower varchar(30),
+        -> Foreign Key (Accession_number) references LibraryBooks(Accession_number)) ;
+
+(a)    Primary key -  Accession_number in table LibraryBooks
+        Foreign Key -  Accession_number in table IssuedBooks
+
+mysql> insert into LibraryBooks values ( 2521,"Mordern Chemistry","Rachna Sagar","Chemistry",'2002-06-11',350.00) ;
+mysql> insert into LibraryBooks values ( 3421,"Database System Concepts","Bayross","CS",'2001-05-14',400.00) ;
+mysql> insert into LibraryBooks values ( 4321,"Python Programming","Navathe","CS",'2002-06-25',430.00) ;
+mysql> insert into LibraryBooks values ( 5321,"Discrete Maths","RD Sharma","Mathematics",'2001-04-04',550.00) ;
+mysql> insert into LibraryBooks values ( 5421,"Literature","Rachna Sagar","English",'2003-08-14',500.00) ;
+
+mysql> insert into IssuedBooks values ( 5321,"Ananya") ;
+mysql> insert into IssuedBooks values ( 4321,"Aman") ;
+mysql> insert into IssuedBooks values ( 5421,"Naman") ;
+mysql> insert into IssuedBooks values ( 3421,"Riya");
+mysql> insert into IssuedBooks values ( 2521,"Arya") ;
+
+(b)   mysql> set Foreign_Key_checks = off ;
+       mysql> delete from IssuedBooks where Accession_number = 3421 ;
+       mysql> delete from LibraryBooks where Title = "Database System Concepts" ;
+       mysql> set Foreign_Key_checks = on ;
+
+(c)   mysql>  Update LibraryBooks
+               ->  set Department = "CS" where Title = "Discrete Maths" ;
+
+(d)   mysql>  Select Title from LibraryBooks
+               ->  where department = "CS" ;
+
+(e)   mysql>  Select Title from LibraryBooks where Department = "CS" and Author = "Navathe" ;
+ 
+(f)   mysql>  Select Title from LibraryBooks L, IssuedBooks I 
+              ->  where L.Accession_number = I.Accession_number and L.Department = "CS" ;
+
+(g)   mysql>  Select Title from LibraryBooks where Price < 500.00 and PurchaseDate between '1999-01-01' and '2004-01-01' ;
+ 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ques(2) :-
+
+mysql> Create database CS_Student ;
+mysql> use CS_Student ;
+
+mysql> Create table Personal_Information ( College_Roll_no int(10) Primary key, Name char(30), DOB date, Address varchar(70),
+       ->  Marks_in_12th int(3), Phone_no varchar(10)) ;
+
+mysql> Create table Paper_Details ( Paper_Code int(4) Primary key, Name_of_the_Paper char(30) unique) ;
+
+mysql> Create table Academic_Details( Roll_no int(10) Primary key, Paper_Code int(4), Attendence int(3), Marks int(3),
+       -> Foreign Key(College_Roll_no) references Personal_Information (College_Roll_no),
+       -> Foreign Key(Paper_Code) references Paper_Details(Paper_Code)) ;
+
+(a)    Primary key - Roll_no in table Personal_Informartion
+                             Paper_Code in table Paper_Details
+        Foreign Key - Roll_no in table Academic_Details
+                             Paper_Code in table Academic_Details 
+
+mysql> insert into Personal_Information values (1201,"Amrita,'2001-01-04',"Delhi",91,9102829875);
+mysql> insert into Personal_Information values (1205,"Anu ",'2001-04-29',"Uttarakhand",89,9748483743);
+mysql> insert into Personal_Information values (1209,"Bhavya",'2000-03-19',"Delhi",94,9837643368);
+mysql> insert into Personal_Information values (1214,"Ishika",'2001-09-21',"Uttar Pradesh",97,9637453672);
+mysql> insert into Personal_Information values (1219,"Riya",'2001-11-09',"Delhi",92,9764563726);
+
+mysql> insert into Paper_Details values (1,"Descriptive Statistics");
+mysql> insert into Paper_Details values (2,"English Communication");
+mysql> insert into Paper_Details values (3,"Algebra");
+mysql> insert into Paper_Details values (4,"Introduction to Matrices");
+mysql> insert into Paper_Details values (5,"Database Management System");
+
+mysql> insert into Academic_Details values (1201,2,80,70);
+mysql> insert into Academic_Details values (1205,2,70,90);
+mysql> insert into Academic_Details values (1214,2,65,91);
+mysql> insert into Academic_Details values (1214,2,65,91);
+mysql> insert into Academic_Details values (1219,1,75,65);
+
+(b) mysql> select pd.Paper_Code, pd.Name_of_the_Paper, pi.Name from Paper_Details pd, Personal_Information pi 
+             -> where Paper_Code = 2 
+             -> and pi.College_Roll_no IN ( Select College_Roll_no from Academic_Details 
+                                                             where Paper_Code = 2 and Attendence > 75 and Marks > 60) ;
+
+(c) mysql> select Name from Personal_Information pi, Academic_Details ad 
+             -> where pi.College_Roll_no = ad.College_Roll_no and ad.Marks > 60 and ad.Paper_Code = 1 and pi.Address = "Delhi" ;
+
+(d) mysql> select pi.Name, ad.Attendence, ad.Marks from Personal_Information pi, Academic_Details ad 
+             -> where pi.College_Roll_no = ad.College_Roll_no ;
+
+(e) mysql> select Name from Personal_Information pi, Academic_Details ad 
+            ->  where pi.College_Roll_no = ad.College_Roll_no and 
+            ->  pi.College_Roll_no = (Select College_Roll_no from Academic_Details 
+                                                    where Marks = (Select max(Marks) from Academic_Details));
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ques(3) :-
+
+mysql> Create database TwoWheeler ;
+mysql> use TwoWheeler ;
+
+mysql> Create table Customer ( CustID varchar(20) Primary Key, email varchar(50), Name char(30), Phone varchar(10) unique,
+       -> ReferrerID varchar(20)) ;
+
+mysql> Create table BicycleModel ( ModelNo varchar(10) Primary key, Manufacturer char(20), Style varchar(20)) ;
+
+mysql> Create table Bicycle ( BicycleId varchar(20) Primary key, DatePurchased date, Color char(10), CustID varchar(20),
+        -> ModelNo varchar(10), Foreign Key(CustID) references Customer(CustID),
+        -> Foreign Key(ModelNo) references BicycleModel(ModelNo)) ;
+
+mysql> Create table Service ( StartDate date, BicycleId varchar(20), EndDate date,
+        -> Foreign Key(BicycleId) references Bicycle(BicycleId)) ;
+
+(a)     Primary key - CustID in table Customer
+                              ModelNo in table BicycleModel
+                              BicycleId in table Bicycle
+         Foreign Key - CustID in table Bicycle
+                               ModelNo in table Bicycle
+                               BicycleId in table Service
+
+mysql> insert into Customer values (1001,"riya123@gmail.com","Riya",9873645321,"C1");
+mysql> insert into Customer values (1002,"ankit4373@gmail.com","Ankit Kumar",8373876327,"A2");
+mysql> insert into Customer values (1003,"rajatkumar8653@gmail.com","Rajat Kumar",9375472814,"C3");
+mysql> insert into Customer values (1004,"sumanjoshi7368@gmail.com","Suman Joshi",8293765392,"B7");
+mysql> insert into Customer values (1005,"rashmitiwari3753@gmail.com","Rashmi Tiwari",9375428765,"C5");
+
+mysql> insert into BicycleModel values ("M101","Honda","Cruiser");
+mysql> insert into BicycleModel values ("M102","Hero","Scooty");
+mysql> insert into BicycleModel values ("M103","Apache","Dirt bike");
+mysql> insert into BicycleModel values ("M104","Hero","Bike");
+mysql> insert into BicycleModel values ("M105","Hero","Sport");
+
+mysql> insert into Bicycle values ("B501",'2019-02-05',"Red","1002","M101");
+mysql> insert into Bicycle values ("B502",'2018-05-22',"Silver","1001","M105");
+mysql> insert into Bicycle values ("B503",'2020-01-03',"Red","1004","M104");
+mysql> insert into Bicycle values ("B504",'2019-04-17',"Blue","1003","M103");
+mysql> insert into Bicycle values ("B505",'2020-02-08',"Black","1002","M102");
+
+mysql> insert into Service values ('2019-09-09','B505',"2019-09-12");
+mysql> insert into Service values ('2018-10-10','B502','2018-10-12');
+mysql> insert into Service values ('2018-04-24','B502','2019-04-26');
+mysql> insert into Service values ('2019-05-17','B501','2019-05-19');
+mysql> insert into Service values ('2020-01-18','B502','2020-01-20');
+
+(b) mysql> Select * from Customer where CustID IN (Select CustID from Bicycle 
+                                                                                 where ModelNo IN (select ModelNo from BicycleModel 
+                                                                                                                 where Manufacturer = "Honda")) ;
+
+(c) mysql> Select * from BicycleModel where ModelNo IN (select ModelNo from Bicycle 
+                                                                                            where CustID IN(select CustID from Customer 
+                                                                                                                       where ReferrerID = "C1")) ;
+
+(d) mysql> select bm.Manufacturer from Bicycle bi, BicycleModel bm where bi.ModelNo = bm.ModelNo and bi.Color = "Red" ;
+
+(e) mysql> select ModelNo from Bicycle where BicycleID IN (select distinct BicycleID from Service) ;
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ques(4) :-
+
+    mysql> Create database EMPLOYEE_Details ;
+    mysql> use EMPLOYEE_Details ;
+  
+   mysql> Create table EMPLOYEE( Person_name char(30) Primary Key, Street char(30), City char(15)) ;
+
+   mysql> Create table Company( Company_Name varchar(30) Primary Key, City char(15)) ;
+
+   mysql> Create table Works( Person_Name char(30), Company_Name varchar(30), Salary decimal(10,2),
+          -> Foreign Key(Person_Name) references EMPLOYEE(Person_Name),
+          -> Foreign Key(Company_Name) references Company(Company_Name));
+
+   mysql> Create table Manages( Person_Name char(30), Manager_Name char(30),
+           -> Foreign Key(Person_Name) references EMPLOYEE(Person_Name)) ;
+
+mysql> insert into EMPLOYEE values ("Rashmi","23/34 B block","Delhi");
+mysql> insert into EMPLOYEE values ("Teena","454/4 V block","Gurgaon");
+mysql> insert into EMPLOYEE values ("Ananya","65/6 A block","Gurgaon");
+mysql> insert into EMPLOYEE values ("Kritika","87/2 D block","Lucknow");
+mysql> insert into EMPLOYEE values ("Gaurav","74/2 F block","Gaziabad");
+mysql> insert into EMPLOYEE values ("Saurav","54/2 G block","Noida");
+mysql> insert into EMPLOYEE values ("Kashish","347-5 A block","Noida");
+mysql> insert into EMPLOYEE values ("Pawan","65/8 V block","Gurgaon");
+mysql> insert into EMPLOYEE values ("Nikhil","62/7 d block","Sitapur");
+mysql> insert into EMPLOYEE values ("Neha","91/8 C block","Gaziabad");
+
+mysql> insert into Company values ("Samba Bank","Delhi");
+mysql> insert into Company values ("NCB Bank","Gurgaon");
+mysql> insert into Company values ("Axis Bank","Noida");
+mysql> insert into Company values ("SBI bank","Lucknow");
+mysql> insert into Company values ("Kotak Bank","Gaziabad");
+
+mysql> insert into Works values ("Rashmi","Samba Bank", 20000);
+mysql> insert into Works values ("Teena","NCB Bank",15000);
+mysql> insert into Works values ("Ananya","Samba Bank",5000);
+mysql> insert into Works values ("Kritika","SBI Bank",8000);
+mysql> insert into Works values ("Gaurav","Axis Bank",10000);
+mysql> insert into works values("Saurav","NCB Bank",20000);
+mysql> insert into works values("Kashish","Kotak Bank",15000);
+mysql> insert into works values("Pawan","Axis Bank",20000);
+mysql> insert into works values("Nikhil","SBI Bank",12000);
+mysql> insert into works values("Neha","Kotak Bank",18000);
+
+mysql> insert into Manages values ("Rashmi","Arun Kumar");
+mysql> insert into Manages values ("Teena","Arun Kumar");
+mysql> insert into Manages values ("Nikhil","Vijay Singh");
+mysql> insert into Manages values ("Neha","Raghuvir Bora");
+mysql> insert into Manages values ("Pawan","Shikha Chandola");
+
+(a)    Primary key - Person_Name in table EMPLOYEE
+                             Company_Name in table Company
+        Foreign Key - Person_Name in table Works
+                             Company_Name in table Works
+                             Person_Name in table Manages
+
+(b) mysql> Alter table EMPLOYEE add column email varchar(20) ;
+
+(c) mysql>  select distinct(Manager_Name) from Manages m, Works w 
+             ->  where m.Person_Name = w.Person_Name and (w.Company_Name = "Samba bank" or w.Company_Name = "NCB Bank") ;
+
+(d) mysql> select e.Person_Name, e.Street, e.City, w.Salary from EMPLOYEE e, Works w 
+             -> where e.Person_Name = w.Person_Name and w.Company_Name = "Samba Bank" and w.Salary > 10000 ;
+
+(e) mysql> select e.Person_Name from EMPLOYEE e, Works w, Company c 
+             -> where e.Person_Name = w.Person_Name and e.City = c.City and w.Company_Name = c.Company_Name ;
+
+(f) mysql> select Company_Name, max(Salary), min(Salary), avg(Salary) from Works Group by Company_Name;
+
+(g) mysql> select Company_Name, sum(Salary), count(Company_Name) as "Number of Employees" 
+             -> from Works Group by Company_Name ;
+
+(h) mysql> select Company_Name, max(Salary) from Works ;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Ques(5) :-
+
+mysql> Create database Product ;
+mysql> use Product ;
+
+mysql> Create table Suppliers( SNo int(8) Primary key, Sname varchar(20), Status char(20), SCity char(30)) ;
+
+mysql> Create table Parts( PNo int(8) Primary key, Pname varchar(20), Colour varchar(20), Weight int(4), City char(20)) ;
+
+mysql> Create table Project( JNo int(8) Primary key, Jname char(20), Jcity char(20)) ;
+
+mysql> Create table  Shipment( Sno varchar(20), Pno int(8), Jno int(8), Quantity int(8),
+        -> Foreign Key(Sno) references suppliers(SNo),
+        -> Foreign Key(Pno) references Parts(PNo),
+        -> Foreign Key(Jno) references Project(JNo));
+
+mysql> insert into Suppliers values (101,"S1",30,"London") ;
+mysql> insert into Suppliers values (102,"S2",19,"New York") ;
+mysql> insert into Suppliers values (103,"S1",22,"Paris") ;
+mysql> insert into Suppliers values (104,"S2",70,"Los Angeles") ;
+mysql> insert into Suppliers values (105,"S3",15,"Singapore") ;
+
+mysql> insert into Parts values ( 501,"P1","Black",16,"Paris") ;
+mysql> insert into Parts values ( 502,"P2","Red",40,"London") ;
+mysql> insert into Parts values ( 503,"P3","Gray",20,"London") ;
+mysql> insert into Parts values ( 504,"P2","Green",60,"Singapore") ;
+mysql> insert into Parts values ( 505,"P2","Black",10,"New York") ;
+
+mysql> insert into project values (1001,"J1","London") ;
+mysql> insert into project values (1002,"J2","New York") ;
+mysql> insert into project values (1003,"J3","New York") ;
+mysql> insert into project values (1004,"J4","Singapore") ;
+mysql> insert into project values (1005,"J4","Delhi");
+
+mysql> insert into Shipment values (101,504,1002,250) ;
+mysql> insert into Shipment values (103,505,1003,100) ;
+mysql> insert into Shipment values (105,502,1003,500) ;
+mysql> insert into Shipment values (101,503,1001,300) ;
+mysql> insert into Shipment values (102,501,1005,750) ;
+mysql> insert into Shipment values (101,501,1002,100) ;
+
+(a)    Primary key - Sno in table Suppliers
+                             Pno in table Parts
+                             Jno in table Project
+
+        Foreign Key - Sno in table Shipment
+                             Pno in table Shipment
+                             Jno in table Shipment
+
+(b) mysql> select SNo from Suppliers where SCity = "Paris" and Status > 20;
+
+(c) mysql> Select * from Suppliers where SNo IN (select SNo from Shipment 
+                                                                             where PNo IN (select Pno from Parts where Pname = "P2")) Order by SNo;
+
+(d) mysql> Select Sname from Suppliers where Sno IN (Select distinct SNo from Shipment 
+                                                                                     where PNo IN (select PNo from Parts where Pname != "P2")) ;
+
+(e) mysql> select s.SNo, s.PNo, s.Jno, s.Quantity, s.Quantity*p.Weight as "Total_Shipment_Weight" 
+             -> from Shipment s, Parts p where s.PNo = p.PNo;
+
+(f) mysql> Select * from Shipment where Quantity between 300 and 750;
+
+(g) mysql> select PNo from Parts where Weight > 16 or PNo IN (select PNo from Shipment 
+             -> where SNo IN (select s.SNo from Shipment s, Suppliers sp where s.SNo = sp.SNo and sp.Sname = "S2")) ;
+
+(h) mysql> select City from Parts where Colour = "Red" and PNo IN (select PNo from Shipment where Quantity > 5) ;
+
+(i) mysql> select * from Parts where PNo IN (select PNo from Shipment 
+            -> where SNo IN (select SNo from Suppliers where Scity = "London")) ;
+
+(j) mysql> select PNo from Shipment where SNo IN (select SNo from Suppliers where Scity = "London") 
+            -> and Jno IN (Select Jno from Project where Jcity = "London");
+
+(k) mysql> select count(distinct(Jno)) as "No. of Project Supplied by Supplier S1" from Shipment 
+             -> where sno IN(select SNo from Suppliers where Sname = "S1") ;
+
+(l) mysql> select count(*) from Parts
+            -> where PNo IN (Select PNo from Shipment where SNo IN (select SNo from Suppliers where Sname = "S1")) and Pname = "P1" ;
+
+--------------------------------------------------------------------------------------END-------------------------------------------------------------------------------------------------------------------------------------------------
